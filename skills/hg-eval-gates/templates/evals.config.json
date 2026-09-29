@@ -1,0 +1,15 @@
+{
+  "gates": [
+    {
+      "name": "golden",
+      "run": "node .hg-gates/golden.mjs --cases evals/goldens.jsonl --cmd 'python -m app.answer'",
+      "must_fail": "node .hg-gates/golden.mjs --cases evals/must-fail.jsonl --cmd 'python -m app.answer'"
+    },
+    {
+      "name": "tests",
+      "run": "pytest -q",
+      "must_fail": "pytest -q tests/must_fail",
+      "must_fail_exit": 1
+    }
+  ]
+}
