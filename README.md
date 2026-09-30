@@ -68,6 +68,7 @@ Each skill has its own setup notes (env vars, integrations, optional dependencie
 | [`hg-ship`](./skills/hg-ship/SKILL.md) | Opinionated ship workflow. Commits, pushes, PR, CI watch, merge, deploy verify, doc sync. The Hourglass team-tested version, with optional hooks for your own review and verify skills. |
 | [`interview-me`](./skills/interview-me/SKILL.md) | Adaptive interviewer that uses AskUserQuestion to clarify what you actually want to build. Runs until 95% confident, then hands off. |
 | [`outcome-loop`](./skills/outcome-loop/SKILL.md) | Grade-and-revise loop. Runs a command, grades the result, diagnoses failures, fixes, and re-runs until it passes or you're stuck. Prevents sycophancy. |
+| [`tutor`](./skills/tutor/SKILL.md) | Personal tutor for any subject. Open Claude in a folder of lecture slides, tutorial sheets and assignment specs; it converts them to one text file (picking up new lectures each week), teaches from your material, then quizzes you with exam-style questions and marks your answers. |
 
 ## Contributing / safety
 
