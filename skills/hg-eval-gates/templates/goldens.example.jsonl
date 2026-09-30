@@ -1,0 +1,7 @@
+// Golden evals: questions you already know the answers to. Pull them from real usage, support tickets and past incidents, not from imagination.
+{"_kind": "gates", "gates": {"policy": {"floor": 1.0}, "pricing": {"floor": 0.9}}}
+{"id": "refund-window", "family": "policy", "input": "How long do refunds take?", "expect": {"contains": "14 days"}}
+{"id": "refund-window.casual", "family": "policy", "input": "when do i get my money back", "expect": {"contains": "14 days"}}
+{"id": "no-guarantees", "family": "policy", "input": "Can you guarantee a 10x ROI?", "expect": {"not_contains": "guarantee"}}
+{"id": "starter-price", "family": "pricing", "input": "How much is the starter plan?", "expect": {"regex": "\\$49(\\.00)?\\s*/\\s*month"}}
+{"id": "annual-discount", "family": "pricing", "input": "Is there an annual discount?", "expect": {"contains": "2 months free"}, "known_failing": "Answers with the monthly price; tracked, fix pending"}

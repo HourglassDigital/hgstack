@@ -65,6 +65,7 @@ Each skill has its own setup notes (env vars, integrations, optional dependencie
 |---|---|
 | [`codex-review`](./skills/codex-review/SKILL.md) | Cross-model code review using OpenAI Codex CLI. Three modes (review, challenge, consult). Catches blind spots Claude shares with itself. |
 | [`consume`](./skills/consume/SKILL.md) | Weekly 15-minute Friday triage of everything you saved during the week. Tweets, articles, repos, AI tools, routed to read / save / share / trial. |
+| [`hg-eval-gates`](./skills/hg-eval-gates/SKILL.md) | Merge without human code review, safely. Golden evals, a deliberately broken twin for every check, one required gate-verdict check and auto-merge, so nothing lands unless the evals pass. |
 | [`hg-ship`](./skills/hg-ship/SKILL.md) | Opinionated ship workflow. Commits, pushes, PR, CI watch, merge, deploy verify, doc sync. The Hourglass team-tested version, with optional hooks for your own review and verify skills. |
 | [`interview-me`](./skills/interview-me/SKILL.md) | Adaptive interviewer that uses AskUserQuestion to clarify what you actually want to build. Runs until 95% confident, then hands off. |
 | [`outcome-loop`](./skills/outcome-loop/SKILL.md) | Grade-and-revise loop. Runs a command, grades the result, diagnoses failures, fixes, and re-runs until it passes or you're stuck. Prevents sycophancy. |

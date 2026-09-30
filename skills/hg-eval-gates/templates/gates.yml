@@ -1,0 +1,46 @@
+# Copy to .github/workflows/gates.yml. Runs every gate in evals.config.json as its
+# own check, then one gate-verdict job that branch protection requires. Adding a
+# gate later needs no protection change: only gate-verdict is required.
+name: gates
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      gates: ${{ steps.list.outputs.gates }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: list
+        run: echo "gates=$(node .hg-gates/run-gates.mjs --list)" >> "$GITHUB_OUTPUT"
+
+  gate:
+    needs: plan
+    name: gate (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        name: ${{ fromJSON(needs.plan.outputs.gates) }}
+    steps:
+      - uses: actions/checkout@v4
+      # Set up your stack here so the gate commands can run, for example:
+      # - uses: actions/setup-python@v5
+      #   with: { python-version: "3.12" }
+      # - run: pip install -r requirements.txt
+      - run: node .hg-gates/run-gates.mjs --gate "${{ matrix.name }}"
+
+  # The only required check. It fails unless planning succeeded AND every gate
+  # actually ran and passed: a skipped or cancelled gate is not a pass.
+  gate-verdict:
+    needs: [plan, gate]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "plan: ${{ needs.plan.result }}  gates: ${{ needs.gate.result }}"
+          [ "${{ needs.plan.result }}" = "success" ] && [ "${{ needs.gate.result }}" = "success" ]
