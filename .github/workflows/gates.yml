@@ -1,0 +1,18 @@
+name: gates
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: SKILL.md frontmatter
+        run: ./scripts/check-frontmatter.py
+      - name: check-generalisable
+        run: ./scripts/check-generalisable.sh .
+      - name: check-shareable
+        run: ./scripts/check-shareable.sh .

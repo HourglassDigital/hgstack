@@ -73,7 +73,7 @@ Each skill has its own setup notes (env vars, integrations, optional dependencie
 
 ## Contributing / safety
 
-Every maintainer commit is gated by three checks before it lands. A `.githooks/pre-commit` hook runs them automatically if you've enabled it in your local clone:
+Every pull request and push to `main` runs three gates in CI (`.github/workflows/gates.yml`). The same checks run locally as a pre-commit hook if you enable it in your clone:
 
 ```bash
 git config core.hooksPath .githooks
@@ -81,17 +81,9 @@ git config core.hooksPath .githooks
 
 The three gates:
 
-1. YAML frontmatter parses on every modified `SKILL.md`.
-2. `check-generalisable.sh` blocks any hardcoded personal usernames, paths, or emails.
-3. `check-shareable.sh` blocks API keys, tokens, private keys, internal URLs, and 1Password vault references.
-
-The audit scripts themselves live alongside this repo (not inside it) so they can be reused across other public-stack repos without duplication. If you're forking and want the same protection, copy them in:
-
-```bash
-mkdir -p ../scripts && cp <path-to>/check-*.sh ../scripts/
-```
-
-The hook auto-detects either `../scripts/` (sibling to the repo) or `scripts/` (inside the repo), and skips gates 2 and 3 with a warning if neither is present.
+1. `scripts/check-frontmatter.py`: every `SKILL.md` has valid YAML frontmatter with `name` and `description`.
+2. `scripts/check-generalisable.sh` blocks any hardcoded personal usernames, paths, or emails.
+3. `scripts/check-shareable.sh` blocks API keys, tokens, and private keys, and warns on internal URLs, IPs, and 1Password vault references.
 
 More each week as we sanitise and ship them.
 
