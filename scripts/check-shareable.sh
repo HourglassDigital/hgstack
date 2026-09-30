@@ -66,8 +66,14 @@ BENIGN='(xxx|example|placeholder|your[_-]|<[^>]+>|\bredacted\b|\bdummy\b|FAKE|sa
 if [[ -f "$TARGET" ]]; then
   FILES="$TARGET"
 elif git -C "$TARGET" rev-parse --git-dir >/dev/null 2>&1; then
-  FILES=$(git -C "$TARGET" ls-files -z | tr '\0' '\n' | grep -vE '\.(pyc|png|jpe?g|gif|pdf|lock)$|(^|/)\.DS_Store$' | sed "s|^|$TARGET/|") \
+  TRACKED=$(git -C "$TARGET" ls-files -z | tr '\0' '\n') \
     || { red "ERROR: could not list files in $TARGET"; exit 2; }
+  FILES=""
+  while IFS= read -r f; do
+    [[ -z "$f" || "$f" =~ \.(pyc|png|jpe?g|gif|pdf|lock)$ || "$f" =~ (^|/)\.DS_Store$ ]] && continue
+    FILES+="$TARGET/$f"$'\n'
+  done <<< "$TRACKED"
+  FILES="${FILES%$'\n'}"
 else
   FILES=$(find "$TARGET" -type f \
       -not -path '*/.git/*' \
