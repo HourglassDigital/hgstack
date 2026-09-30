@@ -29,7 +29,7 @@ Run the same goldens against the live model on a schedule (a `schedule:` trigger
 
 ## Gotchas
 
-- **A new required check is invisible until it has reported once.** Merge the workflow PR (or run it on a PR) before `protect.sh` can require `gate-verdict`.
+- **The required check name must match the job exactly.** A ruleset accepts any name, even one that has never reported, so a typo (or renaming the `gate-verdict` job) leaves a required check that never arrives and blocks every PR. Pass `--check` if you rename the job.
 - **Private repos need a plan with rulesets.** On GitHub Free, `protect.sh` gets a 403 from the rulesets endpoint for private repos.
 - **Strict status checks.** The ruleset requires branches to be up to date with main, so the gates always ran against what will actually merge. A PR behind main needs an update before auto-merge fires.
 - **Pipes swallow failures** unless the shell uses pipefail. Both scripts run commands with `bash -o pipefail`; keep that if you adapt them.

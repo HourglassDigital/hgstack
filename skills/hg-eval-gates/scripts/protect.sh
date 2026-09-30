@@ -64,4 +64,4 @@ else
 fi
 gh api -X PATCH "repos/$REPO" --input - <<<"$SETTINGS" >/dev/null
 echo "merge settings: squash only, auto-merge on, merged branches auto-deleted"
-echo "required check: $CHECK (it must have reported on a PR once before GitHub lists it)"
+echo "required check: $CHECK (must match the verdict job name exactly, or every PR blocks)"
