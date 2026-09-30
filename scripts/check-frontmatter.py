@@ -4,6 +4,7 @@
 Usage: check-frontmatter.py [file ...]   (defaults to every skills/*/SKILL.md)
 """
 import glob
+import re
 import sys
 
 import yaml
@@ -13,11 +14,11 @@ def check(path):
     text = open(path, encoding="utf-8").read()
     if not text.startswith("---\n"):
         return "does not open with a --- line"
-    end = text.find("\n---", 3)
-    if end == -1:
+    close = re.search(r"^---[ \t]*$", text[4:], re.MULTILINE)
+    if not close:
         return "has no closing --- line"
     try:
-        data = yaml.safe_load(text[4:end])
+        data = yaml.safe_load(text[4:4 + close.start()])
     except yaml.YAMLError as e:
         return f"YAML parse failed: {e}"
     if not isinstance(data, dict):
