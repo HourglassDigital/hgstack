@@ -61,11 +61,15 @@ MED_PATTERNS=(
 # Obvious placeholders / examples that should NOT trip the scanner.
 BENIGN='(xxx|example|placeholder|your[_-]|<[^>]+>|\bredacted\b|\bdummy\b|FAKE|sample)'
 
-scan_target() {
-  if [[ -f "$TARGET" ]]; then
-    printf '%s\n' "$TARGET"
-  else
-    find "$TARGET" -type f \
+# List files once, and stop if listing fails: an empty list must never read as clean.
+# In a git repo scan tracked files only, matching a fresh CI checkout.
+if [[ -f "$TARGET" ]]; then
+  FILES="$TARGET"
+elif git -C "$TARGET" rev-parse --git-dir >/dev/null 2>&1; then
+  FILES=$(git -C "$TARGET" ls-files -z | tr '\0' '\n' | grep -vE '\.(pyc|png|jpe?g|gif|pdf|lock)$|(^|/)\.DS_Store$' | sed "s|^|$TARGET/|") \
+    || { red "ERROR: could not list files in $TARGET"; exit 2; }
+else
+  FILES=$(find "$TARGET" -type f \
       -not -path '*/.git/*' \
       -not -path '*/node_modules/*' \
       -not -path '*/__pycache__/*' \
@@ -73,10 +77,13 @@ scan_target() {
       -not -name '*.pyc' \
       -not -name '*.png' -not -name '*.jpg' -not -name '*.jpeg' \
       -not -name '*.gif' -not -name '*.pdf' -not -name '*.lock' \
-      -not -name '.DS_Store' \
-      | sort
-  fi
-}
+      -not -name '.DS_Store' | sort; exit "${PIPESTATUS[0]}") \
+    || { red "ERROR: could not list files in $TARGET"; exit 2; }
+fi
+if [[ -z "$FILES" ]]; then
+  red "ERROR: no files to scan in $TARGET"
+  exit 2
+fi
 
 mask() {
   # show first 6 chars of a matched secret, redact the rest
@@ -121,7 +128,7 @@ run_patterns() {
           fi
         done < <(printf '%s' "$match" | grep -oE -- "$pattern")
       done < <(grep -InE -- "$pattern" "$file" 2>/dev/null)
-    done < <(scan_target)
+    done <<< "$FILES"
   done
 }
 
