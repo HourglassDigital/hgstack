@@ -18,7 +18,7 @@ This repository contains agent skills, hooks, rules, and statuslines as plain ma
 ## Install
 
 ```bash
-git clone https://github.com/f3kin/hgstack.git ~/repos/hgstack
+git clone https://github.com/HourglassDigital/hgstack.git ~/repos/hgstack
 ln -s ~/repos/hgstack/skills/<name> ~/.claude/skills/<name>
 ```
 

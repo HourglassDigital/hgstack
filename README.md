@@ -13,7 +13,7 @@ Skills install as files. No runtime, no framework, no package. Drop them into yo
 Clone the repo and run the installer:
 
 ```bash
-git clone https://github.com/f3kin/hgstack.git ~/repos/hgstack
+git clone https://github.com/HourglassDigital/hgstack.git ~/repos/hgstack
 cd ~/repos/hgstack
 ./install.sh
 ```
