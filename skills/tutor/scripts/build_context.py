@@ -50,10 +50,14 @@ def xml_text(data: bytes, para_tag: str) -> str:
 
 def convert_pdf(path: Path) -> str:
     if shutil.which("pdftotext"):
-        out = subprocess.run(
-            ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True
-        )
-        if out.returncode == 0:
+        try:
+            out = subprocess.run(
+                ["pdftotext", "-layout", str(path), "-"],
+                capture_output=True, text=True, timeout=120,
+            )
+        except (subprocess.TimeoutExpired, OSError):
+            out = None
+        if out is not None and out.returncode == 0:
             pages = out.stdout.split("\f")
             if pages and not pages[-1].strip():
                 pages.pop()
@@ -102,7 +106,10 @@ def main() -> int:
     cache = work / "text"
     cache.mkdir(parents=True, exist_ok=True)
     manifest_path = work / "manifest.json"
-    manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
+    try:
+        manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
+    except json.JSONDecodeError:
+        manifest = {}
 
     sources = sorted(
         (
@@ -119,13 +126,13 @@ def main() -> int:
     seen = {}
     for rel in sources:
         src = root / rel
-        key = str(rel)
+        key = rel.as_posix()
         stamp = [src.stat().st_mtime, src.stat().st_size]
         cached = cache / (key.replace("/", "__") + ".txt")
         if manifest.get(key, {}).get("stamp") != stamp or not cached.exists():
             try:
                 text = convert(src)
-            except (zipfile.BadZipFile, KeyError, OSError) as e:
+            except Exception as e:
                 text = ""
                 print(f"warning: could not convert {key}: {e}", file=sys.stderr)
             cached.write_text(text, encoding="utf-8")

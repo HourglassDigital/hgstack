@@ -20,6 +20,8 @@ The working directory is the subject. At the start of every session, run the bun
 python3 <skill-base-dir>/scripts/build_context.py .
 ```
 
+If the user named a different folder as the argument, pass that path instead of `.`, and read that folder's `.tutor/course.txt`.
+
 It converts every PDF, PPTX, DOCX, MD and TXT file in the folder to text, caches the results in `.tutor/text/`, and writes them all into one file, `.tutor/course.txt`, with a contents table at the top giving the line each source file starts on. Only new or changed files are converted, so a new lecture dropped into the folder is picked up and added on the next run. Run it every session rather than trusting an old `course.txt`, because material arrives week by week.
 
 Its JSON report tells you what changed. Mention any `new` files to the user ("picked up a new lecture: …"). If `no_text_extracted` lists files (scanned or handwritten PDFs), read those with the Read tool, which renders pages as images. If `files` is 0, there is no course material here: say so and ask where their notes are rather than tutoring from general knowledge.
