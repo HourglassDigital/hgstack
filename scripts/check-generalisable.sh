@@ -30,7 +30,7 @@ echo ""
 # Each pattern: regex|description|exclude_glob (optional)
 PATTERNS=(
   '/Users/[a-z][a-z0-9_-]*|Hardcoded macOS user path|'
-  '-Users-[a-z][a-z0-9_]*-[^-]|Hardcoded Claude project path (username-specific)|check-generalisable'
+  '-Users-[a-z][a-z0-9_]*-[^-]|Hardcoded Claude project path (username-specific)|scripts/check-generalisable.sh'
   '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|Email address|'
 )
 
@@ -58,7 +58,7 @@ for pattern_spec in "${PATTERNS[@]}"; do
     rel="${file#$REPO_DIR/}"
 
     # Skip excluded files
-    if [[ -n "$exclude" && "$rel" == *"$exclude"* ]]; then
+    if [[ -n "$exclude" && "$rel" == "$exclude" ]]; then
       continue
     fi
 
@@ -142,4 +142,4 @@ else
 fi
 echo ""
 
-exit $ISSUES
+[[ $ISSUES -eq 0 ]] || exit 1

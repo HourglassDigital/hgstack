@@ -79,7 +79,7 @@ git config core.hooksPath .githooks
 
 The three gates:
 
-1. YAML frontmatter parses on every `SKILL.md`.
+1. `scripts/check-frontmatter.py`: every `SKILL.md` has valid YAML frontmatter with `name` and `description`.
 2. `scripts/check-generalisable.sh` blocks any hardcoded personal usernames, paths, or emails.
 3. `scripts/check-shareable.sh` blocks API keys, tokens, and private keys, and warns on internal URLs, IPs, and 1Password vault references.
 

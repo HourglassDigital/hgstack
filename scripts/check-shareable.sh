@@ -45,7 +45,7 @@ HIGH_PATTERNS=(
   'AIza[0-9A-Za-z_-]{35}|Google API key'
   'eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}|JWT / signed token'
   'BEGIN [A-Z ]*PRIVATE KEY|Private key block'
-  '(password|passwd|secret|api[_-]?key|access[_-]?token|client[_-]?secret)["'"'"' ]*[:=]["'"'"' ]*[A-Za-z0-9/+._-]{12,}|Hardcoded secret assignment'
+  '(password|passwd|secret|api[_-]?key|access[_-]?token|client[_-]?secret)["'"'"' ]*[:=] *["'"'"'][A-Za-z0-9/+._-]{12,}|Hardcoded secret assignment (quoted literal)'
 )
 
 MED_PATTERNS=(
@@ -96,27 +96,31 @@ run_patterns() {
   local level="$1"; shift
   local spec pattern desc file lineno match hit
   for spec in "$@"; do
-    IFS='|' read -r pattern desc <<< "$spec"
+    # Split on the LAST |: patterns use | for alternation.
+    pattern="${spec%|*}"
+    desc="${spec##*|}"
     while IFS= read -r file; do
       # grep -I skips binary; -n line numbers; -E extended regex
       while IFS=: read -r lineno match; do
         [[ -z "$lineno" ]] && continue
-        # skip obvious placeholders
-        if printf '%s' "$match" | grep -qiE "$BENIGN"; then
-          continue
-        fi
-        local hit
-        hit=$(printf '%s' "$match" | grep -oE "$pattern" | head -1)
-        if [[ "$level" == "HIGH" ]]; then
-          red   "  HIGH  [$desc] ${file}:${lineno}"
-          dim   "        $(mask "$hit")"
-          HIGH=$((HIGH+1))
-        else
-          yellow "  MED   [$desc] ${file}:${lineno}"
-          dim    "        ${hit}"
-          MED=$((MED+1))
-        fi
-      done < <(grep -InE "$pattern" "$file" 2>/dev/null)
+        # Placeholder check is per hit, so benign text elsewhere on the line
+        # cannot hide a real secret.
+        while IFS= read -r hit; do
+          [[ -z "$hit" ]] && continue
+          if printf '%s' "$hit" | grep -qiE "$BENIGN"; then
+            continue
+          fi
+          if [[ "$level" == "HIGH" ]]; then
+            red   "  HIGH  [$desc] ${file}:${lineno}"
+            dim   "        $(mask "$hit")"
+            HIGH=$((HIGH+1))
+          else
+            yellow "  MED   [$desc] ${file}:${lineno}"
+            dim    "        ${hit}"
+            MED=$((MED+1))
+          fi
+        done < <(printf '%s' "$match" | grep -oE -- "$pattern")
+      done < <(grep -InE -- "$pattern" "$file" 2>/dev/null)
     done < <(scan_target)
   done
 }
