@@ -1,0 +1,21 @@
+name: gates
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: YAML frontmatter parses on every SKILL.md
+        run: |
+          for f in skills/*/SKILL.md; do
+            python3 -c "import sys, yaml; yaml.safe_load(open(sys.argv[1]).read().split('---', 2)[1])" "$f" || { echo "::error file=$f::YAML frontmatter parse failed"; exit 1; }
+          done
+      - name: check-generalisable
+        run: ./scripts/check-generalisable.sh .
+      - name: check-shareable
+        run: ./scripts/check-shareable.sh .

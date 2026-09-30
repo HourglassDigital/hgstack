@@ -15,11 +15,7 @@ set -euo pipefail
 
 REPO_DIR="$(git rev-parse --show-toplevel)"
 
-# Audit scripts live in the build-wrapper one level up (Finlay's setup).
-# Fall back to a sibling "scripts/" inside the repo if a contributor has copied them in.
-if [ -d "$REPO_DIR/../scripts" ]; then
-  SCRIPTS_DIR="$REPO_DIR/../scripts"
-elif [ -d "$REPO_DIR/scripts" ]; then
+if [ -d "$REPO_DIR/scripts" ]; then
   SCRIPTS_DIR="$REPO_DIR/scripts"
 else
   SCRIPTS_DIR=""
