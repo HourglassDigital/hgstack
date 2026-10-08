@@ -71,9 +71,12 @@ else
 fi
 
 # Pass the secret through a private temp file, never on the command line.
+# Same for the test request's auth header: curl reads it with -H @file, so the
+# token never appears in argv (visible to other local users through ps).
 secret_file="$(mktemp)"
-trap 'rm -f "$secret_file"' EXIT
-chmod 600 "$secret_file"
+header_file="$(mktemp)"
+trap 'rm -f "$secret_file" "$header_file"' EXIT
+chmod 600 "$secret_file" "$header_file"
 printf 'CONSUME_CAPTURE_TOKEN=%s\n' "$TOKEN" > "$secret_file"
 supabase secrets set --project-ref "$REF" --env-file "$secret_file" >/dev/null
 
@@ -101,10 +104,11 @@ ENV
 chmod 600 "$ENV_FILE"
 
 step "Sending a test link through the live endpoint"
+printf 'Authorization: Bearer %s\nContent-Type: application/json\n' "$TOKEN" > "$header_file"
 status=""
 for _ in 1 2 3 4 5; do
   status="$(curl -sS -o /dev/null -w '%{http_code}' -X POST "$CAPTURE_URL" \
-    -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+    -H @"$header_file" \
     -d '{"url":"https://github.com/HourglassDigital/hgstack/tree/main/skills/consume","source":"manual"}' || true)"
   [ "$status" = "201" ] && break
   sleep 3

@@ -48,8 +48,7 @@ From a terminal, the same request looks like this:
 ```bash
 set -a; . ~/.env.consume; set +a
 curl -sS -X POST "$CONSUME_CAPTURE_URL" \
-  -H "Authorization: Bearer $CONSUME_CAPTURE_TOKEN" \
-  -H "Content-Type: application/json" \
+  -H @<(printf 'Authorization: Bearer %s\nContent-Type: application/json\n' "$CONSUME_CAPTURE_TOKEN") \
   -d '{"url":"https://example.com"}'
 # {"success":true,"id":"..."}
 ```

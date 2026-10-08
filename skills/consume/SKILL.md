@@ -31,9 +31,16 @@ path with `CONSUME_ENV_FILE`). `setup/setup.sh` writes the required lines.
 
 ```bash
 set -a; . "${CONSUME_ENV_FILE:-$HOME/.env.consume}"; set +a
+# Auth headers go in a private file that curl reads with -H @file. Never put
+# the key in a -H "..." argument: argv is visible to other local users via ps.
+mkdir -p ~/.consume && (umask 077; printf 'apikey: %s\nAuthorization: Bearer %s\n' \
+  "$CONSUME_SUPABASE_KEY" "$CONSUME_SUPABASE_KEY" > ~/.consume/curl-headers)
 curl -sS "$CONSUME_SUPABASE_URL/rest/v1/consume_items?status=eq.pending&order=created_at.asc" \
-  -H "apikey: $CONSUME_SUPABASE_KEY" -H "Authorization: Bearer $CONSUME_SUPABASE_KEY"
+  -H @"$HOME/.consume/curl-headers"
 ```
+
+Every later call sources the env file the same way and reuses
+`-H @"$HOME/.consume/curl-headers"`. Never echo the key or the env file.
 
 If the env file or either required var is missing, point the user at Setup
 and stop. If nothing is pending, say so and stop; never invent items. Apply
@@ -61,7 +68,7 @@ history stays readable:
 
 ```bash
 curl -sS -X PATCH "$CONSUME_SUPABASE_URL/rest/v1/consume_items?id=eq.<ID>" \
-  -H "apikey: $CONSUME_SUPABASE_KEY" -H "Authorization: Bearer $CONSUME_SUPABASE_KEY" \
+  -H @"$HOME/.consume/curl-headers" \
   -H "Content-Type: application/json" -d '{"title":"<resolved title>"}'
 ```
 
@@ -133,7 +140,7 @@ After any action except Skip:
 
 ```bash
 curl -sS -X PATCH "$CONSUME_SUPABASE_URL/rest/v1/consume_items?id=eq.<ID>" \
-  -H "apikey: $CONSUME_SUPABASE_KEY" -H "Authorization: Bearer $CONSUME_SUPABASE_KEY" \
+  -H @"$HOME/.consume/curl-headers" \
   -H "Content-Type: application/json" \
   -d '{"status":"triaged","action_taken":"<action>","triaged_at":"now()","notes":"<short verdict>"}'
 ```
