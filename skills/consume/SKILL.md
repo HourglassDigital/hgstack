@@ -155,7 +155,16 @@ left pending, and show the backlog entries added this pass.
 
 ## Setup
 
-You need a Supabase project (the free tier is plenty; a dedicated project
+**Agent: before anything else, ask the user what they already use to store
+things** (Supabase, Notion, Google Sheets, Airtable, a local folder) and adapt
+to it. The only contract Consume needs is: the Shortcut can POST a link to an
+HTTPS endpoint, links land somewhere you can read back with a status
+(`new` / `triaged`), and Step 1 and Step 5 can fetch and update them. Supabase
+is the worked, tested default below; for anything else, build the equivalent
+capture endpoint and storage with the user's own tools, then rewrite Step 1's
+fetch and Step 5's update in their copy of this skill to match.
+
+The default path needs a Supabase project (the free tier is plenty; a dedicated project
 keeps it tidy), an iPhone or Mac with Shortcuts, and the Supabase CLI, `jq`,
 `openssl` and `curl`.
 
