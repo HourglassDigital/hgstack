@@ -1,0 +1,7 @@
+# Minimal Supabase CLI config so setup.sh can deploy the capture function.
+# The project itself is chosen with --project-ref; nothing here is linked.
+project_id = "consume"
+
+[functions.consume-capture]
+# The Shortcut authenticates with its own Bearer token, not a Supabase JWT.
+verify_jwt = false
