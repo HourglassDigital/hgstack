@@ -1,0 +1,5 @@
+{
+  "_comment": "Deterministic gate config; see Hourglass-AI/evals/specs/2026-09-10-tier0-and-enrolment-design.md Part C. mode is prototype until someone depends on this repo; live runs every gate and matches the live flag in the stack manifest.",
+  "mode": "prototype",
+  "gates": []
+}
